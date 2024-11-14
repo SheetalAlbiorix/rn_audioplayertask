@@ -6,8 +6,9 @@ import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { formatTime } from '@/constants/Helper';
+import { nextTranscriptPhrase, preTranscriptPhrase } from '@/constants/TranscriptJson';
 
-export default function AudioPlayerView({ setCurrentTime, setTotalTime }: any) {
+export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentPhrase }: any) {
     const [sound, setSound] = useState<any>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [position, setPosition] = useState<any>(0);
@@ -57,19 +58,18 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime }: any) {
     };
 
     const skipForward = async () => {
-        if (sound) {
-            const status = await sound.getStatusAsync();
-            const nextPosition = status.positionMillis + 10000;
-            await sound.setPositionAsync(nextPosition);
+        const phrase = nextTranscriptPhrase(currentPhrase)
+        if (phrase?.end_time != null) {
+            await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
         }
     };
 
     const rewind = async () => {
-        if (sound) {
-            const status = await sound.getStatusAsync();
-            const prevPosition = Math.max(0, status.positionMillis - 10000);
-            await sound.setPositionAsync(prevPosition);
+        const phrase = preTranscriptPhrase(currentPhrase)
+        if (phrase?.end_time != null) {
+            await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
         }
+
     };
 
     const onSliderValueChange = async (value: any) => {
@@ -82,7 +82,6 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime }: any) {
 
     return (
         <View style={styles.container}>
-            <Text>Audio Player</Text>
             <Slider
                 style={styles.slider}
                 value={position / duration}

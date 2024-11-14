@@ -35,7 +35,9 @@ const _layout = () => {
                     if (time != audioTotalTime) {
                         setAudioTotalTime(time)
                     }
-                }} />
+                }}
+                currentPhrase={currentPhrase}
+            />
         </SafeAreaView>
     )
 }
