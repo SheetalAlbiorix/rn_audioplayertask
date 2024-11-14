@@ -48,7 +48,6 @@ export const transcriptArry = () => {
     for (let i = 0; i < maxPhrases; i++) {
         transcriptdata.speakers.forEach(speaker => {
             if (speaker.phrases[i]) {
-
                 groupedPhrases.push({
                     name: speaker.name,
                     phrase: speaker.phrases[i],

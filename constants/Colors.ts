@@ -1,4 +1,6 @@
 export default {
-  primary: "#DBA603",
+  primary: "#E0BE59",
   secondory: "#8B8B8B",
+  overlay: "#ECEEFF",
+  textLight: "#fff",
 };

@@ -36,11 +36,11 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
 
         sound.setOnPlaybackStatusUpdate((status) => {
             if (status.isLoaded) {
+                setTotalTime(status.durationMillis)
+                setCurrentTime(status.positionMillis)
                 setPosition(status.positionMillis);
                 setDuration(status.durationMillis);
                 setIsPlaying(status.isPlaying);
-                setTotalTime(status.durationMillis)
-                setCurrentTime(status.positionMillis)
             }
         });
     };
@@ -58,16 +58,20 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
     };
 
     const skipForward = async () => {
-        const phrase = nextTranscriptPhrase(currentPhrase)
-        if (phrase?.end_time != null) {
-            await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
+        if (currentPhrase !== null) {
+            const phrase = nextTranscriptPhrase(currentPhrase)
+            if (phrase?.end_time != null) {
+                await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
+            }
         }
     };
 
     const rewind = async () => {
-        const phrase = preTranscriptPhrase(currentPhrase)
-        if (phrase?.end_time != null) {
-            await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
+        if (currentPhrase !== null) {
+            const phrase = preTranscriptPhrase(currentPhrase)
+            if (phrase?.end_time != null) {
+                await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
+            }
         }
 
     };

@@ -24,10 +24,12 @@ const _layout = () => {
                 data={transcriptArry()}
                 style={styles.flatlist}
                 showsVerticalScrollIndicator={false}
+                contentContainerStyle={{rowGap:16}}
                 renderItem={renderitem}
             />
             <AudioPlayerView
                 setCurrentTime={(time: any) => {
+
                     const phrase = currentTranscriptPhrase(time)
                     setCurrentPhrase(phrase)
                 }}
