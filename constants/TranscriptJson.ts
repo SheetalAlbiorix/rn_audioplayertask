@@ -1,20 +1,70 @@
 export const transcriptdata = {
-    "pause": 200,
+    "pause": 250,
     "speakers": [
         {
             "name": "John",
             "phrases": [
-                { "words": "this is the first phrase", "time": 741 },
-                { "words": "now the second phrase", "time": 665 },
-                { "words": "end with last phrase", "time": 702 }]
+                {
+                    "words": "this is one phrase.",
+                    "time": 1474
+                },
+                {
+                    "words": "now the second phrase.",
+                    "time": 1667
+                },
+                {
+                    "words": "end with last phrase.",
+                    "time": 1214
+                }
+            ]
         },
         {
             "name": "Jack",
             "phrases": [
-                { "words": "another speaker here", "time": 554 },
-                { "words": "saying his second point", "time": 492 },
-                { "words": "and eventually finishing up", "time": 673 }
+                {
+                    "words": "another speaker here.",
+                    "time": 1570
+                },
+                {
+                    "words": "saying her second phrase.",
+                    "time": 1989
+                },
+                {
+                    "words": "and eventually finishing up.",
+                    "time": 1486
+                }
             ]
         }
     ]
 }
+
+// Determine the maximum number of phrases for any speaker
+const maxPhrases = Math.max(...transcriptdata.speakers.map(speaker => speaker.phrases.length));
+export const transcriptArry = () => {
+    let groupedPhrases: { name: string; phrase: { words: string; time: number; }; end_time: number; }[] = [];
+
+    let time = 0
+    for (let i = 0; i < maxPhrases; i++) {
+        transcriptdata.speakers.forEach(speaker => {
+            if (speaker.phrases[i]) {
+
+                groupedPhrases.push({
+                    name: speaker.name,
+                    phrase: speaker.phrases[i],
+                    end_time: time + speaker.phrases[i].time + transcriptdata.pause
+                });
+                time = time + speaker.phrases[i].time + transcriptdata.pause
+            }
+        });
+    }
+
+    return groupedPhrases
+}
+
+export const currentTranscriptPhrase = (time: any) => {
+    return transcriptArry().find(
+        (item) => {
+            return time >= (item.end_time - item.phrase.time) && time < (item.end_time)
+        });
+}
+

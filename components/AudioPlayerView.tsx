@@ -5,17 +5,14 @@ import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { formatTime } from '@/constants/Helper';
 
-export default function AudioPlayerView() {
+export default function AudioPlayerView({ setCurrentTime, setTotalTime }: any) {
     const [sound, setSound] = useState<any>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [position, setPosition] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const formatTime = (millis: number) => {
-        const minutes = Math.floor(millis / 60000);
-        const seconds = Math.floor((millis % 60000) / 1000);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
+    const [position, setPosition] = useState<any>(0);
+    const [duration, setDuration] = useState<any>(0);
+
     useEffect(() => {
         return sound
             ? () => {
@@ -23,6 +20,7 @@ export default function AudioPlayerView() {
             }
             : undefined;
     }, [sound]);
+
     useEffect(() => {
         loadAudio()
     }, [])
@@ -40,6 +38,8 @@ export default function AudioPlayerView() {
                 setPosition(status.positionMillis);
                 setDuration(status.durationMillis);
                 setIsPlaying(status.isPlaying);
+                setTotalTime(status.durationMillis)
+                setCurrentTime(status.positionMillis)
             }
         });
     };
@@ -72,7 +72,7 @@ export default function AudioPlayerView() {
         }
     };
 
-    const onSliderValueChange = async (value) => {
+    const onSliderValueChange = async (value: any) => {
         if (sound) {
             const newPosition = value * duration;
             await sound.setPositionAsync(newPosition);
@@ -90,7 +90,7 @@ export default function AudioPlayerView() {
                 minimumValue={0}
                 maximumValue={1}
                 minimumTrackTintColor={Colors.primary}
-                maximumTrackTintColor="#8B8B8B"
+                maximumTrackTintColor={Colors.secondory}
                 thumbTintColor={Colors.primary}
             />
             <View style={{ width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

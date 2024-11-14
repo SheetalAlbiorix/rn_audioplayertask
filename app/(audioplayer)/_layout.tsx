@@ -1,29 +1,47 @@
-import { View, Text, SafeAreaView, FlatList } from 'react-native'
-import React from 'react'
+import { SafeAreaView, FlatList, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import TranscriptView from '@/components/TranscriptView'
-import { transcriptdata } from '@/constants/TranscriptJson'
+import { currentTranscriptPhrase, transcriptArry } from '@/constants/TranscriptJson'
 import { Stack } from 'expo-router'
 import AudioPlayerView from '@/components/AudioPlayerView'
 
-const items = ["", "", "", "", "", ""]
 const _layout = () => {
+    const [currentPhrase, setCurrentPhrase] = useState<any>(null);
+    const [audioTotalTime, setAudioTotalTime] = useState(0);
+
+    useEffect(() => {
+        console.log("current phrase: ", currentPhrase);
+    }, [currentPhrase])
+
     const renderitem = (item: any) => {
-        return <TranscriptView item={item.item} />
+        return <TranscriptView item={item.item} highlightPhrase={currentPhrase} />
     }
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <Stack.Screen options={{ title: 'Player' }} />
 
             <FlatList
-                data={transcriptdata.speakers}
-                style={{ flex: 1, marginTop: 10, paddingTop: 10 }}
-                contentContainerStyle={{}}
+                data={transcriptArry()}
+                style={styles.flatlist}
                 showsVerticalScrollIndicator={false}
                 renderItem={renderitem}
             />
-            <AudioPlayerView />
+            <AudioPlayerView
+                setCurrentTime={(time: any) => {
+                    const phrase = currentTranscriptPhrase(time)
+                    setCurrentPhrase(phrase)
+                }}
+                setTotalTime={(time: any) => {
+                    if (time != audioTotalTime) {
+                        setAudioTotalTime(time)
+                    }
+                }} />
         </SafeAreaView>
     )
 }
 
 export default _layout
+
+const styles = StyleSheet.create({
+    flatlist: { flex: 1, marginTop: 10, paddingTop: 10 },
+});
