@@ -1,18 +1,23 @@
 import { SafeAreaView, FlatList, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import TranscriptView from '@/components/TranscriptView'
-import { currentTranscriptPhrase, transcriptArry } from '@/constants/TranscriptJson'
 import { Stack } from 'expo-router'
 import AudioPlayerView from '@/components/AudioPlayerView'
+import { currentTranscriptPhrase, transcriptArry } from '@/constants/Common'
 
 const _layout = () => {
     const [currentPhrase, setCurrentPhrase] = useState<any>(null);
     const [audioTotalTime, setAudioTotalTime] = useState(0);
 
     useEffect(() => {
-        console.log("current phrase: ", currentPhrase);
+        console.log("current phrase: ");
     }, [currentPhrase])
 
+    /**
+     * Speaker Text List item
+     * @param item 
+     * @returns 
+     */
     const renderitem = (item: any) => {
         return <TranscriptView item={item.item} highlightPhrase={currentPhrase} />
     }
@@ -24,12 +29,11 @@ const _layout = () => {
                 data={transcriptArry()}
                 style={styles.flatlist}
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={{rowGap:16}}
+                contentContainerStyle={{ rowGap: 16 }}
                 renderItem={renderitem}
             />
             <AudioPlayerView
                 setCurrentTime={(time: any) => {
-
                     const phrase = currentTranscriptPhrase(time)
                     setCurrentPhrase(phrase)
                 }}

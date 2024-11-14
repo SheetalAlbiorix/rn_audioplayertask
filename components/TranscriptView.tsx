@@ -12,7 +12,6 @@ const TranscriptView = ({ item, highlightPhrase }: any) => {
                 <Text style={[styles.header, isHighlight && styles.highlight]}>{item.name}</Text>
                 <View style={styles.row}>
                     <Text style={isHighlight ? styles.highlight : styles.normal}>{item.phrase?.words}</Text>
-                    {/* <Text style={isHighlight ? styles.highlight : styles.normal}>{formatTime(item.end_time)}</Text> */}
                 </View>
             </View>
         </View>
@@ -28,7 +27,7 @@ const styles = StyleSheet.create({
     },
     viewHighlight: { backgroundColor: Colors.primary, elevation: 2 },
     shadow: { shadowColor: Colors.primary, shadowOpacity: 0.3, shadowRadius: 2.0, shadowOffset: { width: 0.5, height: 0.5 } },
-    view: { width: "90%", backgroundColor: "white", marginBottom: 10, padding: 10, borderRadius: 10 },
+    view: { width: "90%", backgroundColor: "white", padding: 10, borderRadius: 10 },
     row: { alignItems: "center", justifyContent: "space-between", flexDirection: "row" },
     header: { fontWeight: "600", fontSize: 14 },
     normal: { color: Colors.secondory, fontWeight: "400", fontSize: 14 },

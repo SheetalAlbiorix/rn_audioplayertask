@@ -5,8 +5,8 @@ import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { Ionicons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { nextTranscriptPhrase, preTranscriptPhrase, transcriptArry } from '@/constants/Common';
 import { formatTime } from '@/constants/Helper';
-import { nextTranscriptPhrase, preTranscriptPhrase } from '@/constants/TranscriptJson';
 
 export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentPhrase }: any) {
     const [sound, setSound] = useState<any>(null);
@@ -58,22 +58,33 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
     };
 
     const skipForward = async () => {
-        if (currentPhrase !== null) {
-            const phrase = nextTranscriptPhrase(currentPhrase)
-            if (phrase?.end_time != null) {
-                await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
-            }
+        let phrase
+        if (currentPhrase !== null && currentPhrase !== undefined) {
+            phrase = nextTranscriptPhrase(currentPhrase.index)
+        } else if (position == 0 && transcriptArry().length > 0) {
+            phrase = nextTranscriptPhrase(transcriptArry()[0].index)
+        }
+
+        if (phrase?.end_time != null) {
+            await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
+        } else if (phrase == undefined && currentPhrase?.index != null) {
+            let isLastPhrase = transcriptArry()[transcriptArry().length - 1].index == currentPhrase?.index
+            await sound.setPositionAsync(isLastPhrase ? duration : position)
         }
     };
 
     const rewind = async () => {
-        if (currentPhrase !== null) {
-            const phrase = preTranscriptPhrase(currentPhrase)
-            if (phrase?.end_time != null) {
-                await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
-            }
+        let phrase
+        if (currentPhrase !== null && currentPhrase !== undefined) {
+            phrase = preTranscriptPhrase(currentPhrase.index)
+
+        } else if (position == duration && transcriptArry().length > 0) {
+            phrase = preTranscriptPhrase(transcriptArry()[transcriptArry().length - 1].index)
         }
 
+        if (phrase?.end_time != null) {
+            await sound.setPositionAsync(phrase?.index == 1 ? 0 : phrase.end_time - phrase.phrase.time);
+        }
     };
 
     const onSliderValueChange = async (value: any) => {
@@ -101,16 +112,16 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
                 <Text>{formatTime(duration)}</Text>
             </View>
             <View style={styles.controls}>
-                <TouchableOpacity onPress={rewind}>
-                    <Ionicons name="play-back-outline" size={36} color="black" />
+                <TouchableOpacity onPress={rewind} disabled={position < 0.5}>
+                    <Ionicons name="play-back-outline" size={36} color={position < 0.5 ? "gray" : "black"} />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={playPauseAudio}>
                     <Ionicons name={isPlaying ? "pause-circle" : "play-circle"} size={48} color={Colors.primary} />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={skipForward}>
-                    <Ionicons name="play-forward-outline" size={36} color="black" />
+                <TouchableOpacity onPress={skipForward} disabled={position == duration}>
+                    <Ionicons name="play-forward-outline" size={36} color={position == duration ? "gray" : "black"} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -133,4 +144,5 @@ const styles = StyleSheet.create({
         width: '80%',
         marginTop: 20,
     },
+
 });
