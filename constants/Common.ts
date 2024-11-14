@@ -10,8 +10,7 @@ const maxPhrases = Math.max(...transcriptdata.speakers.map(speaker => speaker.ph
  * @returns 
  */
 export const transcriptArry = () => {
-    let groupedPhrases: { name: string; phrase: { words: string; time: number; }; end_time: number; index: number; }[] = [];
-
+    let groupedPhrases: TranscriptPhrase[] = [];
     let time = 0
     let index = 1
     for (let i = 0; i < maxPhrases; i++) {
@@ -37,10 +36,10 @@ export const transcriptArry = () => {
  * @param time 
  * @returns 
  */
-export const currentTranscriptPhrase = (time: any) => {
+export const currentTranscriptPhrase = (time: number) => {
     return transcriptArry().find(
         (item) => {
-            return time >= (item.end_time - item.phrase.time) && time < (item.end_time)
+            return time >= (item?.end_time - item?.phrase?.time) && time < (item?.end_time)
         });
 }
 

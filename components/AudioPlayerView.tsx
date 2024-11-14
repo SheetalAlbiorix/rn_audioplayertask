@@ -1,5 +1,4 @@
-// AudioPlayerView.js
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
@@ -8,11 +7,17 @@ import Colors from '@/constants/Colors';
 import { nextTranscriptPhrase, preTranscriptPhrase, transcriptArry } from '@/constants/Common';
 import { formatTime } from '@/constants/Helper';
 
-export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentPhrase }: any) {
-    const [sound, setSound] = useState<any>(null);
+type audioPlayerView = {
+    setCurrentTime: (time: number | undefined) => void,
+    setTotalTime: (time: number | undefined) => void,
+    currentPhrase: TranscriptPhrase | undefined
+}
+
+export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentPhrase }: audioPlayerView) {
+    const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [position, setPosition] = useState<any>(0);
-    const [duration, setDuration] = useState<any>(0);
+    const [position, setPosition] = useState<number>(0);
+    const [duration, setDuration] = useState<number | undefined>(0);
 
     useEffect(() => {
         return sound
@@ -22,28 +27,25 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
             : undefined;
     }, [sound]);
 
-    useEffect(() => {
-        loadAudio()
-    }, [])
-
-    const loadAudio = async () => {
+    const loadAudio = useCallback(async () => {
         const { sound } = await Audio.Sound.createAsync(
             require('../assets/audio/example_audio.mp3'),
             { shouldPlay: true }
         );
+
         setSound(sound);
         setIsPlaying(true);
 
         sound.setOnPlaybackStatusUpdate((status) => {
             if (status.isLoaded) {
-                setTotalTime(status.durationMillis)
-                setCurrentTime(status.positionMillis)
+                setTotalTime(status.durationMillis);
+                setCurrentTime(status.positionMillis);
                 setPosition(status.positionMillis);
                 setDuration(status.durationMillis);
                 setIsPlaying(status.isPlaying);
             }
         });
-    };
+    }, [setSound, setIsPlaying, setTotalTime, setCurrentTime, setPosition, setDuration]);
 
     const playPauseAudio = async () => {
         if (sound) {
@@ -66,10 +68,10 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
         }
 
         if (phrase?.end_time != null) {
-            await sound.setPositionAsync(phrase.end_time - phrase.phrase.time);
+            await sound?.setPositionAsync(phrase.end_time - phrase.phrase.time);
         } else if (phrase == undefined && currentPhrase?.index != null) {
             let isLastPhrase = transcriptArry()[transcriptArry().length - 1].index == currentPhrase?.index
-            await sound.setPositionAsync(isLastPhrase ? duration : position)
+            await sound?.setPositionAsync(isLastPhrase ? duration ?? 0 : position)
         }
     };
 
@@ -83,13 +85,13 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
         }
 
         if (phrase?.end_time != null) {
-            await sound.setPositionAsync(phrase?.index == 1 ? 0 : phrase.end_time - phrase.phrase.time);
+            await sound?.setPositionAsync(phrase?.index == 1 ? 0 : phrase.end_time - phrase.phrase.time);
         }
     };
 
-    const onSliderValueChange = async (value: any) => {
+    const onSliderValueChange = async (value: number) => {
         if (sound) {
-            const newPosition = value * duration;
+            const newPosition = value * (duration ?? 0);
             await sound.setPositionAsync(newPosition);
             setPosition(newPosition);
         }
@@ -99,7 +101,7 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
         <View style={styles.container}>
             <Slider
                 style={styles.slider}
-                value={position / duration}
+                value={position / (duration ?? 0)}
                 onValueChange={onSliderValueChange}
                 minimumValue={0}
                 maximumValue={1}
@@ -107,13 +109,13 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
                 maximumTrackTintColor={Colors.secondory}
                 thumbTintColor={Colors.primary}
             />
-            <View style={{ width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <View style={styles.sliderContainer}>
                 <Text>{formatTime(position)}</Text>
-                <Text>{formatTime(duration)}</Text>
+                <Text>{formatTime(duration ?? 0)}</Text>
             </View>
             <View style={styles.controls}>
                 <TouchableOpacity onPress={rewind} disabled={position < 0.5}>
-                    <Ionicons name="play-back-outline" size={36} color={position < 0.5 ? "gray" : "black"} />
+                    <Ionicons name="play-back-outline" size={36} color={position < 0.5 ? Colors.gray : Colors.black} />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={playPauseAudio}>
@@ -121,7 +123,7 @@ export default function AudioPlayerView({ setCurrentTime, setTotalTime, currentP
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={skipForward} disabled={position == duration}>
-                    <Ionicons name="play-forward-outline" size={36} color={position == duration ? "gray" : "black"} />
+                    <Ionicons name="play-forward-outline" size={36} color={position == duration ? Colors.gray : Colors.black} />
                 </TouchableOpacity>
             </View>
         </View>
@@ -133,6 +135,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
     },
+    sliderContainer: { width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     slider: {
         width: '100%',
         height: 40,

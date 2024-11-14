@@ -1,9 +1,9 @@
-import { View, Text, StyleSheet, Platform } from 'react-native'
 import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
 import Colors from '@/constants/Colors';
-import { formatTime, plateformMobile } from '@/constants/Helper';
+import { plateformMobile } from '@/constants/Helper';
 
-const TranscriptView = ({ item, highlightPhrase }: any) => {
+const TranscriptView = ({ item, highlightPhrase }: TranscriptProp) => {
     const isHighlight = highlightPhrase?.phrase?.words == item?.phrase?.words
 
     return (
@@ -15,7 +15,6 @@ const TranscriptView = ({ item, highlightPhrase }: any) => {
                 </View>
             </View>
         </View>
-
     )
 }
 

@@ -1,26 +1,24 @@
-import { SafeAreaView, FlatList, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import TranscriptView from '@/components/TranscriptView'
-import { Stack } from 'expo-router'
+import React, { useState } from 'react'
 import AudioPlayerView from '@/components/AudioPlayerView'
+import TranscriptView from '@/components/TranscriptView'
 import { currentTranscriptPhrase, transcriptArry } from '@/constants/Common'
+import { Stack } from 'expo-router'
+import { FlatList, ListRenderItemInfo, SafeAreaView, StyleSheet } from 'react-native'
 
 const _layout = () => {
-    const [currentPhrase, setCurrentPhrase] = useState<any>(null);
-    const [audioTotalTime, setAudioTotalTime] = useState(0);
-
-    useEffect(() => {
-        console.log("current phrase: ");
-    }, [currentPhrase])
+    const [currentPhrase, setCurrentPhrase] = useState<TranscriptPhrase>();
+    const [audioTotalTime, setAudioTotalTime] = useState<number>(0);
 
     /**
      * Speaker Text List item
      * @param item 
      * @returns 
      */
-    const renderitem = (item: any) => {
-        return <TranscriptView item={item.item} highlightPhrase={currentPhrase} />
+
+    const renderitem = ({ item }: ListRenderItemInfo<TranscriptPhrase>) => {
+        return <TranscriptView item={item} highlightPhrase={currentPhrase} />
     }
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <Stack.Screen options={{ title: 'Player' }} />
@@ -33,12 +31,14 @@ const _layout = () => {
                 renderItem={renderitem}
             />
             <AudioPlayerView
-                setCurrentTime={(time: any) => {
-                    const phrase = currentTranscriptPhrase(time)
-                    setCurrentPhrase(phrase)
+                setCurrentTime={(time: number | undefined) => {
+                    if (time != undefined) {
+                        const phrase = currentTranscriptPhrase(time)
+                        setCurrentPhrase(phrase)
+                    }
                 }}
-                setTotalTime={(time: any) => {
-                    if (time != audioTotalTime) {
+                setTotalTime={(time: number | undefined) => {
+                    if (time != undefined && time != audioTotalTime) {
                         setAudioTotalTime(time)
                     }
                 }}
