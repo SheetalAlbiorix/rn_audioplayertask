@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     },
     viewHighlight: { backgroundColor: Colors.primary, elevation: 2 },
     shadow: { shadowColor: Colors.primary, shadowOpacity: 0.3, shadowRadius: 2.0, shadowOffset: { width: 0.5, height: 0.5 } },
-    view: { width: "90%", backgroundColor: "white", padding: 10, borderRadius: 10 },
+    view: { width: "90%", backgroundColor: "white", padding: 10, paddingLeft: plateformMobile ? 15 : 20, borderRadius: 10 },
     row: { alignItems: "center", justifyContent: "space-between", flexDirection: "row" },
     header: { fontWeight: "600", fontSize: 14 },
     normal: { color: Colors.secondory, fontWeight: "400", fontSize: 14 },
